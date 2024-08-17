@@ -79,7 +79,6 @@ netifaces==0.10.4
 numpy==1.15.0
 oauthlib==3.1.0
 olefile==0.46
-openshot-qt==3.1.1
 packaging==20.3
 parameterized==0.9.0
 paramiko==2.6.0
@@ -106,9 +105,8 @@ PyQt5==5.14.1
 PyQtWebEngine==5.14.0
 pyRFC3339==1.1
 pyrsistent==0.19.3
-python-apt==2.0.1+ubuntu0.20.4.1
 python-dateutil==2.7.3
-python-debian==0.1.36+ubuntu1.1
+python-debian==0.1.48
 python-decouple==3.4
 pytz==2019.3
 pyxdg==0.26
@@ -121,7 +119,7 @@ requests-unixsocket==0.2.0
 SecretStorage==2.3.1
 sentry-sdk==0.12.2
 simplejson==3.16.0
-sip==4.19.21
+sip==6.8.6
 six==1.14.0
 smmap==5.0.0
 soupsieve==1.9.5
@@ -130,7 +128,6 @@ sqlparse==0.2.4
 stevedore==4.1.1
 systemd-python==234
 tomli==2.0.1
-ttystatus==0.38
 typing-extensions==4.5.0
 ubuntu-advantage-tools==8001
 ubuntu-drivers-common==0.0.0
