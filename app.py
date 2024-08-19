@@ -6,6 +6,12 @@ import jwt  # PyJWt for authentication, token generation
 from datetime import datetime, timedelta  # for token expiration
 import uuid  # for public id, unique id
 from functools import wraps  # for decorator
+# For password hashing and verification
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv  # Loading environment variables
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Create Flask app
 app = Flask(__name__)
@@ -42,7 +48,7 @@ def token_required(f):
 
         try:
             # Decode the token
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query\
                 .filter_by(public_id=data['public_id']).first()
         except:
@@ -109,7 +115,7 @@ def login():
 
 
 # Route for user signup
-@app.route('/singup', methods=['POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
     # Create dict of the request data
     data = request.form
