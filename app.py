@@ -17,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # Create database app
 db = SQLAlchemy(app)
 
+
 # User model and database ORM
 class User(db.Model):
     # User table
@@ -33,7 +34,7 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
         # Check if toke is in the header
-        if 'x-access-token' in requast.headers:
+        if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
         # If token is not found  return 401
         if not token:
@@ -44,13 +45,13 @@ def token_required(f):
             data = jwt.decode(token, app.config['SECRET_KEY'])
             current_user = User.query\
                 .filter_by(public_id=data['public_id']).first()
-
         except:
             return jsonify({'message': 'Token is invalid!'}), 401
         # Return the current user
         return f(current_user, *args, **kwargs)
 
     return decorated
+
 
 # Route to register users
 @app.route('/user', methods=['GET'])
@@ -70,6 +71,72 @@ def get_all_users(current_user):
 
     # Return the list of users
     return jsonify({'users': output})
+
+
+# Route for user login
+@app.route('/login', methods=['POST'])
+def login():
+    # Get the request data dict
+    auth = request.form
+
+    # Check if the request has email and password
+    if not auth or not auth.get('email') or not auth.get('password'):
+        # Return 401 error if they are not found
+        return make_response('Could not verify', 401,
+                             {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+    # Query the user with the email
+    user = User.query.filter_by(email = auth.get('email')).first()
+
+    # If user is not found return 401
+    if not user:
+        return make_response('Could not verify', 401,
+                             {'WWW-Authenticate': 'Basic realm="User not found!"'})
+
+    # If user is found, check if the password is correct
+    if check_password_hash(user.password, auth.get('password')):
+        # Generate token
+        token = jwt.encode({
+            'public_id': user.public_id,
+            'exp': datetime.utcnow() + timedelta(minutes=30)
+        }, app.config['SECRET_KEY'])
+
+        # Return the token
+        return make_response(jsonify({'token': token}), 201)
+    # Return 403 if passsword is incorrect
+    return make_response('Could not verify', 403,
+                         {'WWW-Authenticate': 'Basic realm="Password incorrect!"'})
+
+
+# Route for user signup
+@app.route('/singup', methods=['POST'])
+def signup():
+    # Create dict of the request data
+    data = request.form
+
+    # Get the data form; name, email and passowrd
+    name, email = data.get('name'), data.get('email')
+    password = data.get('password')
+
+    # Check if the data is complete/User provided all data
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        # Create a new user with database ORM and save
+        user = User(
+            public_id = str(uuid.uuid4()),
+            name = name,
+            email = email,
+            password = generate_password_hash(password)
+        )
+        # Save the user
+        db.session.add(user)
+        db.session.commit()
+
+        # Return 201 if user is created
+        return make_response('Successfully registered', 201)
+    else:
+        # Return 202 if the user is already created
+        return make_response('User already exists. Please Log in.', 202)
 
 
 if __name__ == "__main__":
