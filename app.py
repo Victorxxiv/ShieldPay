@@ -9,17 +9,19 @@ from functools import wraps  # for decorator
 # For password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv  # Loading environment variables
+from flask import Flask, render_template, url_for
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Create Flask app
 app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 # Configuring the database
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # Database URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Create database app
 db = SQLAlchemy(app)
 
@@ -28,10 +30,10 @@ db = SQLAlchemy(app)
 class User(db.Model):
     # User table
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(50), unique=True)
-    name = db.Column(db.String(110))
-    email = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(80))
+    public_id = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(110), nullable=False)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
 
 
 # Decorator for token required
@@ -48,16 +50,25 @@ def token_required(f):
 
         try:
             # Decode the token
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            data = jwt.decode(
+                token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query\
                 .filter_by(public_id=data['public_id']).first()
-        except:
+        except Exception as e:
+            print(e)  # For debugging
             return jsonify({'message': 'Token is invalid!'}), 401
         # Return the current user
         return f(current_user, *args, **kwargs)
 
     return decorated
 
+@app.route('/home')  # Home route
+def home():
+    return render_template('home.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 # Route to register users
 @app.route('/user', methods=['GET'])
@@ -84,20 +95,22 @@ def get_all_users(current_user):
 def login():
     # Get the request data dict
     auth = request.form
-
     # Check if the request has email and password
     if not auth or not auth.get('email') or not auth.get('password'):
         # Return 401 error if they are not found
-        return make_response('Could not verify', 401,
-                             {'WWW-Authenticate': 'Basic realm="Login required!"'})
+        return make_response(
+            'Could not verify', 401,
+            {'WWW-Authenticate': 'Basic realm="Login required!"'}
+        )
 
     # Query the user with the email
-    user = User.query.filter_by(email = auth.get('email')).first()
-
+    user = User.query.filter_by(email=auth.get('email')).first()
     # If user is not found return 401
     if not user:
-        return make_response('Could not verify', 401,
-                             {'WWW-Authenticate': 'Basic realm="User not found!"'})
+        return make_response(
+            'Could not verify', 401,
+            {'WWW-Authenticate': 'Basic realm="User not found!"'}
+        )
 
     # If user is found, check if the password is correct
     if check_password_hash(user.password, auth.get('password')):
@@ -106,36 +119,51 @@ def login():
             'public_id': user.public_id,
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }, app.config['SECRET_KEY'])
-
         # Return the token
-        return make_response(jsonify({'token': token}), 201)
-    # Return 403 if passsword is incorrect
-    return make_response('Could not verify', 403,
-                         {'WWW-Authenticate': 'Basic realm="Password incorrect!"'})
+        return jsonify({'token': token}), 201  # 201 if login is successful
 
+    # Return 403 if passsword is incorrect
+    return make_response(
+        'Could not verify', 403,
+        {'WWW-Authenticate': 'Basic realm="Password incorrect!"'}
+    )
+
+# Route for login page
+@app.route('/login', methods=['GET'])
+def login_get():
+    return render_template('login.html')
+
+# Route for register page
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 # Route for user signup
 @app.route('/signup', methods=['POST'])
 def signup():
     # Create dict of the request data
     data = request.form
-
     # Get the data form; name, email and passowrd
     name, email = data.get('name'), data.get('email')
     password = data.get('password')
 
+    if not name or not email or not password:
+        # Return 400 if the data is incomplete
+        return make_response('Missing data', 400)
+
     # Check if the data is complete/User provided all data
     user = User.query.filter_by(email=email).first()
+
     if not user:
         # Create a new user with database ORM and save
-        user = User(
-            public_id = str(uuid.uuid4()),
-            name = name,
-            email = email,
-            password = generate_password_hash(password)
+        new_user = User(
+            public_id=str(uuid.uuid4()),
+            name=name,
+            email=email,
+            password=generate_password_hash(password, method='pbkdf2:sha256')
         )
         # Save the user
-        db.session.add(user)
+        db.session.add(new_user)
         db.session.commit()
 
         # Return 201 if user is created
