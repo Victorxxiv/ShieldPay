@@ -91,7 +91,7 @@ def get_all_users(current_user):
 
 
 # Route for user login
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     # Get the request data dict
     auth = request.form
@@ -128,10 +128,6 @@ def login():
         {'WWW-Authenticate': 'Basic realm="Password incorrect!"'}
     )
 
-# Route for login page
-@app.route('/login', methods=['GET'])
-def login_get():
-    return render_template('login.html')
 
 # Route for register page
 @app.route('/register')
@@ -139,7 +135,7 @@ def register():
     return render_template('register.html')
 
 # Route for user signup
-@app.route('/signup', methods=['POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     # Create dict of the request data
     data = request.form
