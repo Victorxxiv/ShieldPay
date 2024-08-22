@@ -6,6 +6,7 @@ from utils.TransactionServices import TransactionServices
 from auth.auth import Authentication
 
 
+# Intialize services
 account_service = AccountService()
 transaction_service = TransactionServices()
 user_authenticator = Authentication()
@@ -41,7 +42,7 @@ def get_all_transactions():
     # Get authenticated user
     user_id = user_authenticator.get_authenticated_user()
     transactions = transaction_service.get_all_transactions(user_id)
-    return transactions
+    return jsonify(transactions), 200
 
 
 # Get a specific transaction
@@ -55,7 +56,7 @@ def get_transaction(transaction_id):
 
 
 # Approve a transaction
-@user_trans.route('/approve/<String:transaction_id>', methods=['PATCH'])
+@user_trans.route('/approve/<string:transaction_id>', methods=['PATCH'])
 @jwt_required
 def approve_transaction(transaction_id):
     transaction = transaction_service.get_transaction(transaction_id)
@@ -73,7 +74,7 @@ def approve_transaction(transaction_id):
 
 
 # Cancel a transaction
-@user_trans.route('/cancel/<String:transaction_id>', methods=['PATCH'])
+@user_trans.route('/cancel/<string:transaction_id>', methods=['PATCH'])
 @jwt_required
 def cancel_transaction(transaction_id):
     transaction = transaction_service.get_transaction(transaction_id)
@@ -90,8 +91,6 @@ def cancel_transaction(transaction_id):
 def deposit_funds():
     pass
 
-
-# Withdraw funds
 @user_trans.route('/withdraw')
 @jwt_required
 def withdraw_funds():

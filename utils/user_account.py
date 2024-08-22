@@ -73,14 +73,14 @@ class AccountService:
             if sender_account.Total_funds < amount:
                 return jsonify({"message": "Insufficient funds"}), 400
             try:
-                self._db.begin()
+                self.__db.begin()
                 sender_account.Total_funds -= amount
                 sender_account.outgoing_funds += amount
                 receiver_account.incoming_funds += amount
-                self._db.save()
+                self.__db.save()
 
             except SQLAlchemyError as e:
-                self._db.rollback()
+                self.__db.rollback()
                 return jsonify({"message": "Transaction failed"}), 400
         else:
             return jsonify({"message": "The sender_account or receiver account does not exist"}), 400
@@ -89,10 +89,10 @@ class AccountService:
 
     def reverse_money(self, amount, sender_id, receiver_id):
         sender_account = self.__db.query(Accounts).filter_by(user_id=sender_id).first()
-        receiver_account = self._db.query(Accounts).filter_by(user_id=receiver_id).first()
+        receiver_account = self.__db.query(Accounts).filter_by(user_id=receiver_id).first()
         if sender_account and receiver_account:
             try:
-                self._db.begin()
+                self.__db.begin()
                 sender_account.outgoing_funds -= amount
                 sender_account.Total_funds += amount
                 receiver_account.incoming_funds -= amount
@@ -109,10 +109,10 @@ class AccountService:
     def send_money(self, amount, sender_id, receiver_id):
 
         sender_account = self.__db.query(Accounts).filter_by(user_id=sender_id).first()
-        receiver_account = self._db.query(Accounts).filter_by(user_id=receiver_id).first()
+        receiver_account = self.__db.query(Accounts).filter_by(user_id=receiver_id).first()
         if sender_account and receiver_account:
             try:
-                self._db.begin()
+                self.__db.begin()
                 sender_account.outgoing_funds -= amount
                 receiver_account.Total_funds += amount
                 receiver_account.incoming_funds -= amount

@@ -76,7 +76,7 @@ def login_user():
     # Get user data from request
     data = request.get_json()
     email = data.get('email')
-    phone_number = data.get('phoneNumber')
+    phone_number = data.get('phone_number')
     password = data.get('password')
 
     # Validate required fields
@@ -101,7 +101,7 @@ def login_user():
 
     if phone_number:
         # Login with phone number
-        user = user_auth.get_user_by_email(phone_number)
+        user = user_auth.get_user_by_phone_number(phone_number)
         if not user:
             return jsonify({"message": "user not found"}), 404
         if not user_auth.verify_password(password, user.password):

@@ -59,3 +59,40 @@ ShieldPay is
     {
     "message": "User already exists. Please log in."
     }
+
+
+Static Files:
+
+Endpoint: static
+URL Rule: /static/<path:filename>
+Methods: OPTIONS, HEAD, GET
+User Registration:
+
+Endpoint: app_views.register_user
+URL Rule: /api/v1/views/register
+Methods: OPTIONS, POST
+User Login:
+
+Endpoint: app_views.login_user
+URL Rule: /api/v1/views/login
+Methods: OPTIONS, POST
+Get User Profile:
+
+Endpoint: app_views.get_user
+URL Rule: /api/v1/views/profile
+Methods: OPTIONS, HEAD, GET
+User Logout:
+
+Endpoint: app_views.logout
+URL Rule: /api/v1/views/logout
+Methods: OPTIONS, POST
+Home Page:
+
+Endpoint: home
+URL Rule: /
+Methods: OPTIONS, HEAD, GET
+Health Check:
+
+Endpoint: health
+URL Rule: /health
+Methods: OPTIONS, HEAD, GET

@@ -6,9 +6,16 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from os import getenv
 from dotenv import load_dotenv
+from models.basemodel import Base
+from urllib.parse import quote_plus
+import logging
 
 # Load the environment variables
 load_dotenv()
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create a DB class
 class DB:
@@ -27,18 +34,26 @@ class DB:
         user = getenv('PG_USER')
         password = getenv('PG_PWD')
         host = getenv('PG_HOST')
+        port = getenv('PG_PORT', '5432') 
         db_name = getenv('PG_DB')
         env = getenv('APP_ENV')
+        # Check if any required environment variable is missing
+        if not all([user, password, host, db_name]):
+            logger.error("Missing environment variables.")
+            raise ValueError("Required environment variables are not set.")
+
+        # URL encode the password if necessary
+        password = quote_plus(password)
+
         try:
-            # Create the database engine
-            self.__engine = create_engine(f'postgresql://{user}:{password}@{host}/{db_name}')
-            # Reload the session
+            # Create the engine with URL-encoded password
+            self.__engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db_name}')
             self.reload()
 
             if env == 'test':
-                # Drop all tables if in test environment
                 Base.metadata.drop_all(self.__engine)
         except SQLAlchemyError as e:
+            logger.error(f"Error initializing database engine: {e}")
             raise e
 
 

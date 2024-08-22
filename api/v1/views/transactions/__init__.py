@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-user_trans = Blueprint('user_trans', __name__, url_prefix='/api/v1/views/')
+user_trans = Blueprint('user_trans', __name__, url_prefix='/api/v1/views/transactions')
 
 
 from api.v1.views.transactions.transact_view import *

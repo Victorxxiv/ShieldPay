@@ -149,3 +149,6 @@ zope.component==4.3.0
 zope.event==4.4
 zope.hookable==5.0.0
 zope.interface==4.7.1
+bcrypt
+flask_jwt_extended
+flask_cors
