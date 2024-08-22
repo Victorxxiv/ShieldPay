@@ -12,8 +12,8 @@ transaction_service = TransactionServices()
 user_authenticator = Authentication()
 
 # Create transaction
-@user_trans.route('/transact', methods=['POST'])
-@jwt_required
+@user_trans.route('/transact', methods=['POST'], endpoint='create_transaction')
+@jwt_required()
 def create_transaction():
     # Get authenticated user
     sender_id = user_authenticator.get_authenticated_user()
@@ -36,8 +36,8 @@ def create_transaction():
 
 
 # Get all transactions
-@user_trans.route('/transactions', methods=['GET'])
-@jwt_required
+@user_trans.route('/transactions', methods=['GET'], endpoint='get_all_transactions')
+@jwt_required()
 def get_all_transactions():
     # Get authenticated user
     user_id = user_authenticator.get_authenticated_user()
@@ -46,8 +46,8 @@ def get_all_transactions():
 
 
 # Get a specific transaction
-@user_trans.route('/transaction/<int:transaction_id>', methods=['GET'])
-@jwt_required
+@user_trans.route('/transaction/<int:transaction_id>', methods=['GET'], endpoint='get_transaction')
+@jwt_required()
 def get_transaction(transaction_id):
     transaction = transaction_service.get_transaction(transaction_id)
     if not transaction:
@@ -56,8 +56,8 @@ def get_transaction(transaction_id):
 
 
 # Approve a transaction
-@user_trans.route('/approve/<string:transaction_id>', methods=['PATCH'])
-@jwt_required
+@user_trans.route('/approve/<string:transaction_id>', methods=['PATCH'], endpoint='approve_transaction')
+@jwt_required()
 def approve_transaction(transaction_id):
     transaction = transaction_service.get_transaction(transaction_id)
     if not transaction:
@@ -74,8 +74,8 @@ def approve_transaction(transaction_id):
 
 
 # Cancel a transaction
-@user_trans.route('/cancel/<string:transaction_id>', methods=['PATCH'])
-@jwt_required
+@user_trans.route('/cancel/<string:transaction_id>', methods=['PATCH'], endpoint='cancel_transaction')
+@jwt_required()
 def cancel_transaction(transaction_id):
     transaction = transaction_service.get_transaction(transaction_id)
     if not transaction:
@@ -86,12 +86,12 @@ def cancel_transaction(transaction_id):
 
 
 # Deposit funds
-@user_trans.route('/deposit')
-@jwt_required
+@user_trans.route('/deposit', methods=['POST'], endpoint='deposit_funds')
+@jwt_required()
 def deposit_funds():
     pass
 
-@user_trans.route('/withdraw')
-@jwt_required
+@user_trans.route('/withdraw', methods=['POST'], endpoint='withdraw_funds')
+@jwt_required()
 def withdraw_funds():
     pass

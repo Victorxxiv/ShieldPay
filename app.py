@@ -17,6 +17,7 @@ from api.v1.views.transactions import user_trans
 from db.storage import DB
 from celery import Celery
 
+
 db = DB()
 db.reload()
 
@@ -48,19 +49,19 @@ app.config['JWT_COOKIE_SAMESITE'] = "None"
 
 
 # Mail server config
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+# app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+# app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+# app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+# app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+# app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
+# app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL')
+# app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 
 app.url_map.strict_slashes = False
 
-# app.register_blueprint(app_views)
-# app.register_blueprint(user_trans)
+app.register_blueprint(app_views, url_prefix='/api/v1/user')
+app.register_blueprint(user_trans, url_prefix='/api/v1/transactions')
 
 
 host = os.getenv("APP_HOST", "0.0.0.0")
@@ -73,11 +74,11 @@ else:
     app.debug = False
 
 # Configure CORS
-cors = CORS(app, origins="0.0.0.0")
-cors = CORS(app, resources={r'/*': {'origins': host}})
-cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
-CORS(app_views, resources={r"/api/v1/views": {"origins": "http://localhost:5432"}},
-     supports_credentials=True)
+# cors = CORS(app, origins="0.0.0.0")
+# cors = CORS(app, resources={r'/*': {'origins': host}})
+# cors = CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+# CORS(app_views, resources={r"/api/v1/views": {"origins": "http://localhost:5432"}},
+#    supports_credentials=True)
 
 
 @app.route("/")
@@ -87,9 +88,9 @@ def home():
 def health():
     return jsonify({"Message": "Healthy!"}), 200
 
-@jwt.expired_token_loader
-def handle_expired_token_callback():
-    return redirect('/api/v1/views/login')
+# @jwt.expired_token_loader
+# def handle_expired_token_callback():
+#   return redirect('/api/v1/views/login')
 
 
 @app.before_request
@@ -166,12 +167,17 @@ def setup_global_errors():
     for cls in HTTPException.__subclasses__():
         app.register_error_handler(cls, global_error_handler)
 
+@app.route('/test', methods=['GET'])
+def test_route():
+    return jsonify({"message": "Test route works!"}), 200
 
 if __name__ == "__main__":
     """
     MAIN Flask App
     """
+    with app.app_context():
+        print(app.url_map)
     # initializes global error handling
     setup_global_errors()
     # start Flask app
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, debug=True)

@@ -55,17 +55,16 @@ def register_user():
         # Create user and account
         usr = user_auth.create_user(email=email, password=password, first_name=first_name, last_name=last_name, phone_number=phone_number, location=location, is_active=is_active, last_login=last_login_str)
         account = account_service.create_account(Total_funds=0, incomming_funds=0, outgoing_funds=0, user_id=usr.id)
-
         # Generate verification token and send verification email
         # verification_token = generate_verification_token()
         # mail_response = send_verification_email(user_email=email, verification_token=verification_token)
-
         # Prepare account details for response
         account_deets = { 'account_number': account.account_number, 'Total_funds': account.Total_funds, 'incomming_funds': account.incomming_funds, 'outgoing_funds': account.outgoing_funds, 'user_id': account.user_id }
-
         # Return success response
         return jsonify({"message": "user created successfully", "user_id": str(usr.id), "account_message": "account created with the following credentials", 'account_details': account_deets}), 201
 
+#@app_views.route('/verify_email/<string: token>', methods=['GET'])
+#def verify_email(token):
 
 # Login a user
 @app_views.route('/login', methods=['POST'])
