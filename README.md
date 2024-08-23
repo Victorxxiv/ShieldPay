@@ -14,16 +14,16 @@ ShieldPay is a flask framework based payment system that facilitates Third Party
 
 This document provides an explanation of the backend structure of ShieldPay.
 
-ShieldPay/tree/main/api/v1/views/user
+**ShieldPay/tree/main/api/v1/views/user**
 This path contains routes/endpoints for handling Registration, Login, User Profile, and Logout.
 
-ShieldPay/tree/main/api/v1/views/transactions
+**ShieldPay/tree/main/api/v1/views/transactions**
 This path contains routes/endpoints for handling transactions.
 
 ### User_Views
 
 @app_views.route('/register', methods=\['POST'\])
-Function: register_user()
+Function: **register_user()**
 
 Input Data Validation: Retrieves registration data from the JSON payload. Checks for required fields (email, password, first_name, last_name, phone_number, location). Returns a 400 error if any field is missing.
 
@@ -33,7 +33,7 @@ Account Creation: Calls account_service.create_account() to initialize an accoun
 
 Response: Returns a JSON response with a 201 status code, including user details and account information.
 
-@app_views.route('/login', methods=\['POST'\])
+**@app_views.route('/login', methods=\['POST'\])**
 Function: login_user()
 
 Data Extraction: Extracts email, phone_number, and password from the request data.
@@ -50,7 +50,7 @@ Token Creation and Cookie Setting: Creates an access token and sets it as a cook
 
 Response: Returns a JSON response with a 200 status code on successful login.
 
-@app_views.route('/profile', methods=\['GET'\])
+**@app_views.route('/profile', methods=\['GET'\])**
 Function: get_user()
 
 JWT Authentication: Requires a valid JWT token. Extracts user_id from the token.
@@ -59,19 +59,19 @@ User Existence Check: Checks if the user exists. Returns a 404 error if not foun
 
 Response: Returns user details as a JSON response with a 200 status code.
 
-@app_views.route('/logout', methods=\['POST'\])
+**@app_views.route('/logout', methods=\['POST'\])**
 Function: logout()
 
 Handles logout by removing the access token from the response.
 
 ### Transact_View
 
-@user_trans.route('/transact', methods=\['POST'\])
+**@user_trans.route('/transact', methods=\['POST'\])**
 Function: create_transaction()
 
 Functionality: Creates a new transaction. Requires a JWT token.
 
-@user_trans.route('/transactions', methods=\['GET'\])
+**@user_trans.route('/transactions', methods=\['GET'\])**
 Function: get_all_transactions()
 
 Functionality: Retrieves all transactions for the authenticated user. Requires JWT token.
@@ -184,11 +184,11 @@ Class Attributes:
 db: An instance of the DB class, initialized when an Admin instance is created.
 Methods:
 
-get_all_transactions(): Retrieves all transactions from the database using the Transactions SQLAlchemy model. It assumes the db attribute provides a query method for database operations.
+**get_all_transactions():** Retrieves all transactions from the database using the Transactions SQLAlchemy model. It assumes the db attribute provides a query method for database operations.
 
-get_all_accounts(): Retrieves all accounts from the database using the Accounts SQLAlchemy model.
+**get_all_accounts():** Retrieves all accounts from the database using the Accounts SQLAlchemy model.
 
-get_all_users(): Retrieves all users from the database using the User SQLAlchemy model.
+**get_all_users():** Retrieves all users from the database using the User SQLAlchemy model.
 
 ### GetRelationships
 
@@ -213,13 +213,13 @@ Class Attributes:
 
 \_\_db: An instance of the DB class, initialized when a TransactionService instance is created.
 
-reload(): Reloads the \_\_db instance, which may be involved in managing database connections or configurations.
+**reload():** Reloads the \_\_db instance, which may be involved in managing database connections or configurations.
 
 Methods:
 
 \*\*create_transaction(kwargs): Creates a new transaction. Takes keyword arguments like sender_id, receiver_id, and amount. Creates a Transactions model instance, sets its attributes, adds it to the database, and saves the changes.
 
-get_transaction(transaction_id): Retrieves a specific transaction from the database based on transaction_id.
+**get_transaction(transaction_id):** Retrieves a specific transaction from the database based on transaction_id.
 
 view_user_specific_transactions(user_id): Retrieves all transactions where the given user_id matches the sender_id. Fetches a list of transactions from the database.
 
@@ -227,7 +227,7 @@ view_user_specific_transactions(user_id): Retrieves all transactions where the g
 
 MessagesService
 
-Class Attributes:
+**Class Attributes:**
 
 \_\_db: An instance of the DB class.
 
@@ -247,9 +247,9 @@ delete_all_user_messages(self, user_id): Deletes all messages associated with a 
 
 ### TransactionLogic
 
-TransactionService
+**TransactionService**
 
-Class Attributes:
+**Class Attributes:**
 
 \_\_db: An instance of the DB class, representing a database connection.
 
@@ -267,7 +267,7 @@ view_user_specific_transactions(self, user_id): Retrieves all transactions where
 
 AccountService
 
-Class Attributes:
+**Class Attributes:**
 
 \_\_db: An instance of the DB class, representing a database connection.
 
