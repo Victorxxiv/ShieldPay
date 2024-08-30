@@ -5,7 +5,7 @@ Flask App sends and accept json api requests to the set frontend
 from datetime import datetime, timedelta
 from functools import wraps
 import uuid
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request, render_template
 from flask_sqlalchemy import SQLAlchemy  # Database ORM
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -95,9 +95,14 @@ else:
 #    supports_credentials=True)
 
 
-@app.route("/")
+#@app.route("/")
+#def home():
+#    return jsonify({"Message": "Landing page display"}), 200
+
+@app.route('/home')  # Home route
 def home():
-    return jsonify({"Message": "Landing page display"}), 200
+    return render_template('home.html')
+
 @app.route("/health")
 def health():
     return jsonify({"Message": "Healthy!"}), 200
@@ -143,13 +148,9 @@ def token_required(f):
 
     return decorated
 
-#@app.route('/home')  # Home route
-#def home():
-#    return render_template('home.html')
-
-#@app.route('/about')
-#def about():
-#    return render_template('about.html')
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 # Route to register users
 @app.route('/user', methods=['GET'])
@@ -211,9 +212,9 @@ def login():
 
 
 # Route for register page
-#@app.route('/register')
-#def register():
-#    return render_template('register.html')
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 # Route for user signup
 @app.route('/signup', methods=['GET', 'POST'])
